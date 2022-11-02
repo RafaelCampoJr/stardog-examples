@@ -28,7 +28,7 @@ import com.complexible.stardog.api.Getter;
 import com.complexible.stardog.api.SelectQuery;
 import com.complexible.stardog.api.admin.AdminConnection;
 import com.complexible.stardog.api.admin.AdminConnectionConfiguration;
-
+import com.complexible.stardog.api.admin.DatabaseBuilder;
 import com.stardog.stark.IRI;
 import com.stardog.stark.Statement;
 import com.stardog.stark.Values;
@@ -54,8 +54,6 @@ public class ConnectionAPIExample {
 	// API, which is the preferred way to interact with Stardog.  This will show how to use both the administrative
 	// and client APIs to perform some basic operations.
 	public static void main(String[] args) throws Exception {
-		// First need to initialize the Stardog instance which will automatically start the embedded server.
-		Stardog aStardog = Stardog.builder().create();
 
 		try {
 			// Using AdminConnection
@@ -69,7 +67,10 @@ public class ConnectionAPIExample {
 			// is required, or a user who has been granted the ability to perform the actions.  You can learn
 			// more about this in the [Security chapter](http://docs.stardog.com/security).
 
-			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toEmbeddedServer()
+
+			// TODO check that the server is alive and available here if it is not throw an error
+
+			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toServer("http://localhost:5820")
 			                                                                    .credentials("admin", "admin")
 			                                                                    .connect()) {
 				// With our admin connection, we're able to see if the database for this example already exists, and
@@ -78,8 +79,7 @@ public class ConnectionAPIExample {
 					aAdminConnection.drop("testConnectionAPI");
 				}
 
-				// Create a disk-based database with default settings
-				aAdminConnection.disk("testConnectionAPI").create();
+				aAdminConnection.newDatabase("testConnectionAPI").create();
 
 				// Using the SNARL API
 				// -------------------
@@ -93,6 +93,7 @@ public class ConnectionAPIExample {
 				try (Connection aConn = ConnectionConfiguration
 					                        .to("testConnectionAPI")
 					                        .credentials("admin", "admin")
+											.server("http://localhost:5820")
 					                        .connect()) {
 					// All changes to a database *must* be performed within a transaction.  We want to add some data to the database
 					// so we can begin firing off some queries, so first, we'll start a new transaction.
@@ -222,7 +223,7 @@ public class ConnectionAPIExample {
 			}
 		}
 		finally {
-			aStardog.shutdown();
+			System.out.println("\n\nConnectionAPIExample ran successfully");
 		}
 	}
 }
