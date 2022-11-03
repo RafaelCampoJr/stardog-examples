@@ -38,23 +38,23 @@ public class ConnectionPoolsExample {
 	// -------------------
 	// In this example, we illustrate the configuration and use of the SNARL [ConnectionPool](http://docs.stardog.com/javadoc/snarl/com/complexible/stardog/api/ConnectionPool.html)
 	public static void main(String[] args) throws Exception {
-		// First need to initialize the Stardog instance which will automatically start the embedded server.
-		Stardog aStardog = Stardog.builder().create();
 
 		try {
 			// Second create a temporary database to use (if there is one already, drop it first)
-			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toEmbeddedServer().credentials("admin", "admin").connect()) {
+			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toServer("http://localhost:5820").credentials("admin", "admin").connect()) {
 				if (aAdminConnection.list().contains("testConnectionPool")) {
 					aAdminConnection.drop("testConnectionPool");
 				}
 
 				// Create a disk-based database with default settings
-				aAdminConnection.disk("testConnectionPool").create();
+				aAdminConnection.newDatabase("testConnectionPool").create();
 				// Pools are based around a [ConnectionConfiguration](http://docs.stardog.com/javadoc/snarl/com/complexible/stardog/api/ConnectionConfiguration.html).
 				// This configuration tells the pool how to create the new connections as they are needed.
 				ConnectionConfiguration aConnConfig = ConnectionConfiguration
-					                                      .to("testConnectionPool")
-					                                      .credentials("admin", "admin");
+													.to("testConnectionPool")
+													.credentials("admin", "admin")
+													.server("http://localhost:5820")
+													.credentials("admin", "admin");
 
 				// Now we want to create the [configuration for our pool](http://docs.stardog.com/javadoc/snarl/com/complexible/stardog/api/ConnectionPoolConfig.html).
 				// We start by providing the `ConnectionConfiguration` we just created, that's the basis of the pool.  Then
@@ -82,8 +82,7 @@ public class ConnectionPoolsExample {
 			}
 		}
 		finally {
-			// always shut down the instance when you are done with it
-			aStardog.shutdown();
+			System.out.println("\n\nConnectionPoolsExample ran successfully");
 		}
 	}
 }

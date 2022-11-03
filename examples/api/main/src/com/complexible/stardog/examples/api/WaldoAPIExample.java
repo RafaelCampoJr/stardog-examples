@@ -48,27 +48,24 @@ public class WaldoAPIExample {
 	// A short example illustrating the use of the [full text search capabilities](http://docs.stardog.com/#_full_text_search) in Stardog
 	// via the SNARL API.
 	public static void main(String[] args) throws Exception {
-		// First need to initialize the Stardog instance which will automatically start the embedded server.
-		Stardog aStardog = Stardog.builder().create();
 
 		try {
 			// Open an `AdminConnection` to Stardog so that we can setup the database for the example
-			try (AdminConnection dbms = AdminConnectionConfiguration.toEmbeddedServer()
-			                                                        .credentials("admin", "admin")
-			                                                        .connect()) {
+			try (AdminConnection dbms = AdminConnectionConfiguration.toServer("http://localhost:5820").credentials("admin", "admin").connect()) {
 				// If our example database exists, drop it and create it anew
 				if (dbms.list().contains("waldoTest")) {
 					dbms.drop("waldoTest");
 				}
 
 				// Create a disk database with full-text index
-				dbms.disk("waldoTest")
+				dbms.newDatabase("waldoTest")
 				    .set(SearchOptions.SEARCHABLE, true)
 				    .create();
 
 				// Obtain a `Connection` to the database we just created
 				try (Connection aConn = ConnectionConfiguration
 					                        .to("waldoTest")
+											.server("http://localhost:5820")
 					                        .credentials("admin", "admin")
 					                        .connect()) {
 					// To start, lets add some data into the database so that it can be queried and searched
@@ -141,7 +138,7 @@ public class WaldoAPIExample {
 			}
 		}
 		finally {
-			aStardog.shutdown();
+
 		}
 	}
 }

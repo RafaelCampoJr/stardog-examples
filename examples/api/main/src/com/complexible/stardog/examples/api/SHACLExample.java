@@ -62,24 +62,19 @@ public class SHACLExample {
 	public static void main(String[] args) throws Exception {
 		String aDb = "testSHACL";
 		
-		// First need to initialize the Stardog instance which will automatically start the embedded server.
-		Stardog aStardog = Stardog.builder().create();
 
 		// Open an `AdminConnection` to Stardog so we can set up our database for the example
-		try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toEmbeddedServer()
-		                                                                    .credentials("admin", "admin")
-		                                                                    .connect()) {
+		try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toServer("http://localhost:5820").credentials("admin", "admin").connect()) {
 			// If the example database exists, drop it, so we can create it fresh
 			if (aAdminConnection.list().contains(aDb)) {
 				aAdminConnection.drop(aDb);
 			}
 
 			// create a new database with some data
-			ConnectionConfiguration aConfig = aAdminConnection.newDatabase(aDb)
-			                                                  .create(Paths.get("data/music_beatles.ttl"));
+			aAdminConnection.newDatabase(aDb).create(Paths.get("data/music_beatles.ttl"));
 
 			// connect to the database and convert the connection to an ICVConnection
-			try (ICVConnection aConn = aConfig.connect().as(ICVConnection.class)) {
+			try (ICVConnection aConn = ConnectionConfiguration.to("waldoTest").server("http://localhost:5820").credentials("admin", "admin").connect().as(ICVConnection.class)) {
 				// add the SHACL constraints to the database
 				aConn.begin();
 				aConn.add()
@@ -132,7 +127,7 @@ public class SHACLExample {
 			}
 		}
 		finally {
-			aStardog.shutdown();
+			
 		}
 	}
 }

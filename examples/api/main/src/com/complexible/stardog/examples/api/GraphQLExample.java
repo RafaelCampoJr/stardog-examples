@@ -32,16 +32,12 @@ import graphql.ExecutionResult;
 public class GraphQLExample {
 
 	public static void main(String[] args) throws Exception {
-		// First need to initialize the Stardog instance which will automatically start the embedded server.
-		Stardog aStardog = Stardog.builder().create();
 
 		String db = "graphQL";
 
 		try {
 			// Open an `AdminConnection` to Stardog so we can set up our database for the example
-			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toEmbeddedServer()
-			                                                                    .credentials("admin", "admin")
-			                                                                    .connect()) {
+			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toServer("http://localhost:5820").credentials("admin", "admin").connect()) {
 				// If the example database exists, drop it, so we can create it fresh
 				if (aAdminConnection.list().contains(db)) {
 					aAdminConnection.drop(db);
@@ -52,10 +48,11 @@ public class GraphQLExample {
 
 				// Obtain a GraphQLConnection connection to the database
 				try (GraphQLConnection aConn = ConnectionConfiguration
-					                               .to(db)
+					                               .to(db) 
 					                               .credentials("admin", "admin")
-					                               .connect()
-					                               .as(GraphQLConnection.class)) {
+												   .server("http://localhost:5820")
+												   .connect()
+												   .as(GraphQLConnection.class)) {
 					ExecutionResult aResult;
 
 					// execute a GraphQL query
@@ -101,7 +98,7 @@ public class GraphQLExample {
 			}
 		}
 		finally {
-			aStardog.shutdown();
+
 		}
 	}
 }

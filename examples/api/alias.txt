@@ -1,0 +1,15 @@
+alias comp='./gradlew compileJava'
+
+alias ec='./gradlew execute -PmainClass=com.complexible.stardog.examples.api.ConnectionAPIExample -PstardogHome=/Users/rafaelcampo/tools/stardog/stardog-7.9.0/ --stacktrace'
+
+alias ecp='./gradlew execute -PmainClass=com.complexible.stardog.examples.api.ConnectionPoolsExample -PstardogHome=/Users/rafaelcampo/tools/stardog/stardog-7.9.0/ --stacktrace'
+
+alias eee='./gradlew execute -PmainClass=com.complexible.stardog.examples.api.ExplanationExample -PstardogHome=/Users/rafaelcampo/tools/stardog/stardog-7.9.0/ --stacktrace'
+
+alias ege='./gradlew execute -PmainClass=com.complexible.stardog.examples.api.GraphQLExample -PstardogHome=/Users/rafaelcampo/tools/stardog/stardog-7.9.0/ --stacktrace'
+
+alias ere='./gradlew execute -PmainClass=com.complexible.stardog.examples.api.ReasoningExample -PstardogHome=/Users/rafaelcampo/tools/stardog/stardog-7.9.0/ --stacktrace'
+
+alias ese='./gradlew execute -PmainClass=com.complexible.stardog.examples.api.SHACLExample -PstardogHome=/Users/rafaelcampo/tools/stardog/stardog-7.9.0/ --stacktrace'
+
+alias ewae='./gradlew execute -PmainClass=com.complexible.stardog.examples.api.WaldoAPIExample -PstardogHome=/Users/rafaelcampo/tools/stardog/stardog-7.9.0/ --stacktrace'

@@ -44,8 +44,6 @@ public class ReasoningExample {
 	// In this example we'll walk through a simple example using the SNARL API to access Stardog's
 	// reasoning capabilities.
 	public static void main(String[] args) throws Exception {
-		// First need to initialize the Stardog instance which will automatically start the embedded server.
-		Stardog aStardog = Stardog.builder().create();
 
 		try {
 			// Using AdminConnection
@@ -58,9 +56,7 @@ public class ReasoningExample {
 			// Most operations supported by the DBMS require specific permissions, so either an admin account
 			// is required, or a user who has been granted the ability to perform the actions.  You can learn
 			// more about this in the [Security chapter](http://docs.stardog.com/security).
-			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toEmbeddedServer()
-			                                                                    .credentials("admin", "admin")
-			                                                                    .connect()) {
+			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toServer("http://localhost:5820").credentials("admin", "admin").connect()) {
 				// With our admin connection, we're able to see if the database for this example already exists, and
 				// if it does, we want to drop it and re-create so that we can run the example from clean database.
 				if (aAdminConnection.list().contains("reasoningExampleTest")) {
@@ -68,7 +64,7 @@ public class ReasoningExample {
 				}
 
 				// create a disk database
-				aAdminConnection.disk("reasoningExampleTest").create();
+				aAdminConnection.newDatabase("reasoningExampleTest").create();
 
 
 				// Using reasoning via SNARL
@@ -85,6 +81,7 @@ public class ReasoningExample {
 				try (ReasoningConnection aReasoningConn = ConnectionConfiguration
 					                                          .to("reasoningExampleTest")
 					                                          .credentials("admin", "admin")
+															  .server("http://localhost:5820")
 					                                          .reasoning(true)
 					                                          .connect()
 					                                          .as(ReasoningConnection.class);
@@ -122,7 +119,7 @@ public class ReasoningExample {
 			}
 		}
 		finally {
-			aStardog.shutdown();
+			
 		}
 	}
 

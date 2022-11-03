@@ -57,11 +57,9 @@ public class ExplanationExample {
 	// Here we will show a short example of how to use the [explanation features of Stardog](http://docs.stardog.com/#_explaining_reasoning_results)
 	// to find out _why_ an inference was made.
 	public static void main(String[] args) throws Exception {
-		// First need to initialize the Stardog instance which will automatically start the embedded server.
-		Stardog aStardog = Stardog.builder().create();
 
 		try {
-			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toEmbeddedServer().credentials("admin", "admin").connect()) {
+			try (AdminConnection aAdminConnection = AdminConnectionConfiguration.toServer("http://localhost:5820").credentials("admin", "admin").connect()) {
 				// Drop the example database if it exists and start fresh
 				if (aAdminConnection.list().contains("reasoningTest")) {
 					aAdminConnection.drop("reasoningTest");
@@ -73,10 +71,11 @@ public class ExplanationExample {
 				// We'll use `as(...)` to give us a view of the parent connection that exposes the Stardog
 				// [reasoning capabilities](http://docs.stardog.com/javadoc/snarl/com/complexible/stardog/api/reasoning/ReasoningConnection.html).
 				try (ReasoningConnection aReasoningConnection = ConnectionConfiguration.to("reasoningTest")
-				                                                                       .credentials("admin", "admin")
-				                                                                       .reasoning(true)
-				                                                                       .connect()
-				                                                                       .as(ReasoningConnection.class)) {
+																					.credentials("admin", "admin")
+																					.server("http://localhost:5820")
+																					.reasoning(true)
+																					.connect()
+																					.as(ReasoningConnection.class)) {
 					// Add a simple schema and couple instance triples to the database that we'll use for the example
 					aReasoningConnection.begin();
 					aReasoningConnection.add()
@@ -161,7 +160,7 @@ public class ExplanationExample {
 			}
 		}
 		finally {
-			aStardog.shutdown();
+			// System.out.println("\n\ExplanationExample ran successfully");
 		}
 	}
 }

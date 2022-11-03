@@ -39,6 +39,10 @@ import com.stardog.stark.query.io.QueryResultFormats;
 import com.stardog.stark.query.io.QueryResultWriters;
 import com.stardog.stark.vocabs.RDF;
 
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime;    
+import com.complexible.common.base.Option;
+
 /**
  * <p>Example code illustrating use of the Stardog Connection API</p>
  *
@@ -47,6 +51,12 @@ import com.stardog.stark.vocabs.RDF;
  * @since 0.4
  */
 public class ConnectionAPIExample {
+
+	public static void printTime(String msg) {    
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+		LocalDateTime now = LocalDateTime.now();  
+		System.out.println("INFO " + dtf.format(now) + " - " + msg);  
+	   }
 
 	// Using the SNARL API
 	// -------------------
@@ -122,6 +132,39 @@ public class ConnectionAPIExample {
 
 					// Now that we're done adding data to the database, we can go ahead and commit the transaction.
 					aConn.commit();
+
+
+
+					// // Using the ADD graph management SPARQL operator
+
+					// System.out.println("Using the ADD graph management SPARQL operator");
+					// printTime("starting connection") ;
+
+					// aConn.begin();
+
+
+					// printTime("starting update");
+					// aConn.update("ADD <virtual://vg-trade> TO DEFAULT").execute();
+					// printTime("update complete");
+
+					// // aConn.update("ADD <tag:stardog:api:context:default> TO <https://stardog/examples/data_add_test>").execute();
+
+					// SelectQuery addQuery = aConn.select("SELECT (count(*) AS ?count) { GRAPH <virtual://vg-trade> { ?subject rdf:type :trade }}");
+
+					// addQuery.limit(10);
+
+					// try(SelectQueryResult aResult = addQuery.execute()) {
+					// 	System.out.println("Number of Trades in the Virtual Graph");
+
+					// 	QueryResultWriters.write(aResult, System.out, TextTableQueryResultWriter.FORMAT);
+					// }
+
+					// printTime("starting commit");
+					// aConn.commit();
+
+					// printTime("commit complete"); 
+
+
 
 					// Removing data from a database is just as easy.  Again, we need to start a transaction before making any changes.
 					aConn.begin();
