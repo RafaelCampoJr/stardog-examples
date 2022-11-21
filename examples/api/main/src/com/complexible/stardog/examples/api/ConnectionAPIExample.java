@@ -20,12 +20,16 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.calcite.util.Static;
+
 import com.complexible.common.rdf.query.resultio.TextTableQueryResultWriter;
 import com.complexible.stardog.Stardog;
 import com.complexible.stardog.api.Connection;
 import com.complexible.stardog.api.ConnectionConfiguration;
 import com.complexible.stardog.api.Getter;
+import com.complexible.stardog.api.GraphQuery;
 import com.complexible.stardog.api.SelectQuery;
+import com.complexible.stardog.api.UpdateQuery;
 import com.complexible.stardog.api.admin.AdminConnection;
 import com.complexible.stardog.api.admin.AdminConnectionConfiguration;
 import com.complexible.stardog.api.admin.DatabaseBuilder;
@@ -137,32 +141,62 @@ public class ConnectionAPIExample {
 
 					// // Using the ADD graph management SPARQL operator
 
-					// System.out.println("Using the ADD graph management SPARQL operator");
-					// printTime("starting connection") ;
+					System.out.println("Using the ADD graph management SPARQL operator");
+					printTime("starting connection") ;
 
-					// aConn.begin();
+					aConn.begin();
 
 
-					// printTime("starting update");
-					// aConn.update("ADD <virtual://vg-trade> TO DEFAULT").execute();
-					// printTime("update complete");
+					
+					// aConn.update("ADD <virtual://vg-trade> TO DEFAULT").timeout(10000).execute();
+					GraphQuery updateQuery = aConn.graph("ADD DEFAULT TO <https://stardog/examples/data_add_test>");
 
-					// // aConn.update("ADD <tag:stardog:api:context:default> TO <https://stardog/examples/data_add_test>").execute();
+					printTime("starting update");
+					
 
-					// SelectQuery addQuery = aConn.select("SELECT (count(*) AS ?count) { GRAPH <virtual://vg-trade> { ?subject rdf:type :trade }}");
+					// This is the line that throw the "Cannot execute update query on read endpoint" Exception
+					// TODO - fiqure out how to have read endpoint
+					// updateQuery.execute();
 
-					// addQuery.limit(10);
+					printTime("update complete");
 
-					// try(SelectQueryResult aResult = addQuery.execute()) {
-					// 	System.out.println("Number of Trades in the Virtual Graph");
+					aConn.commit();
 
-					// 	QueryResultWriters.write(aResult, System.out, TextTableQueryResultWriter.FORMAT);
-					// }
 
-					// printTime("starting commit");
-					// aConn.commit();
 
-					// printTime("commit complete"); 
+					aConn.begin();
+
+					// aConn.update("ADD <tag:stardog:api:context:default> TO <https://stardog/examples/data_add_test>").execute();
+					
+					SelectQuery addQuery = aConn.select("SELECT (count(*) AS ?count) { GRAPH <https://stardog/examples/data_add_test> { ?s ?p ?o }}");
+
+					try(SelectQueryResult aResult = addQuery.execute()) {
+						System.out.println("Check that the ADD command worked");
+
+						QueryResultWriters.write(aResult, System.out, TextTableQueryResultWriter.FORMAT);
+					}
+
+					aConn.commit();
+					
+
+
+					aConn.begin();
+
+					// checks connection to virtual graph from the Java API
+					SelectQuery tradeVirtualGraphTest = aConn.select("SELECT (count(*) AS ?count) { GRAPH <virtual://vg-trade> { ?subject rdf:type :trade }}");
+
+					tradeVirtualGraphTest.limit(10);
+
+					try(SelectQueryResult aResult = tradeVirtualGraphTest.execute()) {
+						System.out.println("Number of Trades in the Virtual Graph");
+
+						QueryResultWriters.write(aResult, System.out, TextTableQueryResultWriter.FORMAT);
+					}
+
+					printTime("starting commit");
+					aConn.commit();
+
+					printTime("commit complete"); 
 
 
 
@@ -261,12 +295,14 @@ public class ConnectionAPIExample {
 					// remove the database
 					if (aAdminConnection.list().contains("testConnectionAPI")) {
 						aAdminConnection.drop("testConnectionAPI");
+
+						System.out.println("\n\nConnectionAPIExample ran successfully");
 					}
 				}
 			}
 		}
 		finally {
-			System.out.println("\n\nConnectionAPIExample ran successfully");
+			
 		}
 	}
 }
